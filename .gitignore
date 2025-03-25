@@ -1,4 +1,8 @@
-**/.neo4j_data/
-**/.venv/
-**/data/nvdcve-1.1-2024.json
 .vscode/
+
+.neo4j_data/
+data/nvdcve-1.1-2024.json
+
+.venv/
+.metals/
+.bloop/

@@ -1,0 +1,6 @@
+SPARK_BIN_LOCATION := "~/Downloads/spark-3.5.5-bin-hadoop3/bin"
+SPARK_JAR_LOCATION := "target/scala-2.12/scala-spark_2.12-0.1.0.jar"
+
+run CLASS_FILE:
+  sbt package
+  {{SPARK_BIN_LOCATION}}/spark-submit --class {{CLASS_FILE}} --master local[4] {{SPARK_JAR_LOCATION}}
