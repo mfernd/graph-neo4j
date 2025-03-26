@@ -1,6 +1,44 @@
-SPARK_BIN_LOCATION := "~/Downloads/spark-3.5.5-bin-hadoop3/bin"
 SPARK_JAR_LOCATION := "target/scala-2.12/scala-spark_2.12-0.1.0.jar"
 
-run CLASS_FILE:
+init:
+  #!/bin/bash
+  set -e
+  minikube start
+  helmfile apply
+  kubectl exec -n minio svc/minio -- mc alias set local http://localhost:9000 minioadmin minioadmin 
+  kubectl exec -n minio svc/minio -- mc mb local/mybucket
+  kubectl exec -n minio svc/minio -- mc anonymous set download local/mybucket
+  kubectl port-forward -n minio svc/minio 9000:9000 & \
+    kubectl port-forward -n minio svc/minio-console 9001:9001
+
+destroy:
+  minikube delete
+
+recreate:
+  @just destroy
+  @just init
+
+build-upload:
   sbt package
-  {{SPARK_BIN_LOCATION}}/spark-submit --class {{CLASS_FILE}} --master local[4] {{SPARK_JAR_LOCATION}}
+  @echo "Uploading target/scala-2.12/scala-spark.jar file on bucket..."
+  @eval $(kubectl exec -n minio svc/minio -- mc share upload --expire=1m --insecure --json local/mybucket/scala-spark.jar | jq -r '.share' | sed "s+@<FILE>+@{{SPARK_JAR_LOCATION}}+")
+
+data-upload:
+  #!/bin/bash
+  set -e
+  find data/ -type f | while read file; do
+    echo "Uploading $file..."
+    eval $(kubectl exec -n minio svc/minio -- mc share upload --expire=1m --insecure --json local/mybucket/$file | jq -r '.share' | sed "s+@<FILE>+@$file+")
+  done
+
+run-simple-app:
+  just --justfile {{justfile()}} build-upload
+  just --justfile {{justfile()}} data-upload
+  @kubectl delete -f manifests/spark-app-simple-app.yaml > /dev/null || true
+  kubectl apply -f manifests/spark-app-simple-app.yaml
+
+run-users-test:
+  just --justfile {{justfile()}} build-upload
+  just --justfile {{justfile()}} data-upload
+  @kubectl delete -f manifests/spark-app-users-test.yaml > /dev/null || true
+  kubectl apply -f manifests/spark-app-users-test.yaml

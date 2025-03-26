@@ -1,0 +1,26 @@
+repositories:
+  - name: spark-operator
+    url: https://kubeflow.github.io/spark-operator
+  - name: minio
+    url: https://charts.min.io/
+
+releases:
+  - name: spark-operator
+    namespace: spark-operator
+    chart: spark-operator/spark-operator
+    version: 2.1.1
+  - name: minio
+    namespace: minio
+    chart: minio/minio
+    version: 5.4.0
+    set:
+      - name: mode
+        value: standalone
+      - name: replicas
+        value: 1
+      - name: rootUser
+        value: minioadmin
+      - name: rootPassword
+        value: minioadmin
+      - name: persistence.enabled
+        value: false
