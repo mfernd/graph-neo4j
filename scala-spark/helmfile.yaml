@@ -3,6 +3,8 @@ repositories:
     url: https://kubeflow.github.io/spark-operator
   - name: minio
     url: https://charts.min.io/
+  - name: neo4j
+    url: https://helm.neo4j.com/neo4j
 
 releases:
   - name: spark-operator
@@ -24,3 +26,16 @@ releases:
         value: minioadmin
       - name: persistence.enabled
         value: false
+  - name: neo4j-standalone
+    namespace: neo4j
+    chart: neo4j/neo4j
+    version: 2025.2.0
+    set:
+      - name: neo4j.edition
+        value: community
+      - name: neo4j.name
+        value: neo4j
+      - name: neo4j.password
+        value: CHANGEME
+      - name: volumes.data.mode
+        value: defaultStorageClass
