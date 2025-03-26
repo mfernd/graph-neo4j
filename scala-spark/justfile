@@ -48,3 +48,9 @@ run-stackoverflow:
   just --justfile {{justfile()}} data-upload
   @kubectl delete -f manifests/spark-app-stackoverflow.yaml > /dev/null || true
   kubectl apply -f manifests/spark-app-stackoverflow.yaml
+
+run-neo4j:
+  just --justfile {{justfile()}} build-upload
+  just --justfile {{justfile()}} data-upload
+  @kubectl delete -f manifests/spark-app-neo4j.yaml > /dev/null || true
+  kubectl apply -f manifests/spark-app-neo4j.yaml
