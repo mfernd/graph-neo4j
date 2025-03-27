@@ -40,38 +40,39 @@ data-upload:
 run-simple-app:
   just --justfile {{justfile()}} build-upload
   just --justfile {{justfile()}} data-upload
-  @kubectl delete -f manifests/spark-app-simple-app.yaml > /dev/null || true
+  @kubectl delete -f manifests/spark-app-simple-app.yaml 2> /dev/null || true
   kubectl apply -f manifests/spark-app-simple-app.yaml
 
 run-users-test:
   just --justfile {{justfile()}} build-upload
   just --justfile {{justfile()}} data-upload
-  @kubectl delete -f manifests/spark-app-users-test.yaml > /dev/null || true
+  @kubectl delete -f manifests/spark-app-users-test.yaml 2> /dev/null || true
   kubectl apply -f manifests/spark-app-users-test.yaml
 
 run-stackoverflow:
   just --justfile {{justfile()}} build-upload
   just --justfile {{justfile()}} data-upload
-  @kubectl delete -f manifests/spark-app-stackoverflow.yaml > /dev/null || true
+  @kubectl delete -f manifests/spark-app-stackoverflow.yaml 2> /dev/null || true
   kubectl apply -f manifests/spark-app-stackoverflow.yaml
 
 run-neo4j:
   just --justfile {{justfile()}} build-upload
   just --justfile {{justfile()}} data-upload
-  @kubectl delete -f manifests/spark-app-neo4j.yaml > /dev/null || true
+  @kubectl delete -f manifests/spark-app-neo4j.yaml 2> /dev/null || true
   kubectl apply -f manifests/spark-app-neo4j.yaml
 
 run-wikipedia-analysis:
   just --justfile {{justfile()}} build-upload
   just --justfile {{justfile()}} data-upload
-  @kubectl delete -f manifests/spark-app-wikipedia-analysis.yaml > /dev/null || true
+  @kubectl delete -f manifests/spark-app-wikipedia-analysis.yaml 2> /dev/null || true
   kubectl apply -f manifests/spark-app-wikipedia-analysis.yaml
 
-run-minio-streaming-test:
+run-minio-file-streaming:
   just --justfile {{justfile()}} build-upload
-  eval $(kubectl exec -n minio svc/minio -- mc share upload --expire=1m --insecure --json local/mybucket/input/users.csv | jq -r '.share' | sed "s+@<FILE>+@data/users.csv+")
-  @kubectl delete -f manifests/spark-app-minio-streaming-test.yaml > /dev/null || true
-  kubectl apply -f manifests/spark-app-minio-streaming-test.yaml
+  eval $(kubectl exec -n minio svc/minio -- mc share upload --expire=1m --insecure --json local/mybucket/input/users_1.csv | jq -r '.share' | sed "s+@<FILE>+@data/users_1.csv+")
+  @kubectl delete -f manifests/spark-app-minio-file-streaming.yaml 2> /dev/null || true
+  kubectl apply -f manifests/spark-app-minio-file-streaming.yaml
+  @echo "Then you can upload 'data/users_2.csv' to http://localhost:9001/browser/mybucket/input/"
 
 # Kafka utils
 list-topics:

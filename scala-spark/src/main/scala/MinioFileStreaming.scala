@@ -5,14 +5,14 @@ import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.streaming.{StreamingContext, Seconds}
 import org.apache.spark.sql.types._
 
-object MinioStreamingTest extends App {
+object MinioFileStreaming extends App {
   val minio_endpoint = "http://minio.minio.svc.cluster.local:9000"
   val accessKeyId = "minioadmin"
   val accessKey = "minioadmin"
 
   val spark = SparkSession
     .builder()
-    .appName("MinIO Streaming Test")
+    .appName("MinIO File Streaming")
     .config(
       "spark.hadoop.fs.s3a.impl",
       "org.apache.hadoop.fs.s3a.S3AFileSystem"
