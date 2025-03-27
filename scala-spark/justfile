@@ -54,3 +54,9 @@ run-neo4j:
   just --justfile {{justfile()}} data-upload
   @kubectl delete -f manifests/spark-app-neo4j.yaml > /dev/null || true
   kubectl apply -f manifests/spark-app-neo4j.yaml
+
+run-wikipedia-analysis:
+  just --justfile {{justfile()}} build-upload
+  just --justfile {{justfile()}} data-upload
+  @kubectl delete -f manifests/spark-app-wikipedia-analysis.yaml > /dev/null || true
+  kubectl apply -f manifests/spark-app-wikipedia-analysis.yaml

@@ -12,4 +12,8 @@ lazy val root = (project in file("."))
   )
 
 libraryDependencies += "org.apache.spark" %% "spark-sql" % "3.5.5"
+// Neo4j connector
 libraryDependencies += "org.neo4j" %% "neo4j-connector-apache-spark" % "5.3.1_for_spark_3"
+// Spark streaming (with Kafka)
+libraryDependencies += "org.apache.spark" % "spark-streaming_2.12" % "3.5.5"
+libraryDependencies += "org.apache.spark" % "spark-streaming-kafka-0-10_2.12" % "3.5.5"
