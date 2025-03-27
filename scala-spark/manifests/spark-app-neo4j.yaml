@@ -6,23 +6,20 @@ metadata:
 spec:
   type: Scala
   mode: cluster
-  image: spark:3.5.3
+  image: bitnami/spark:3.5.5-debian-12-r1
   imagePullPolicy: IfNotPresent
-  sparkVersion: 3.5.3
+  sparkVersion: 3.5.5
   mainClass: fr.umontpellier.polytech.Neo4jTest
   mainApplicationFile: http://minio.minio.svc.cluster.local:9000/mybucket/scala-spark.jar
-  deps:
-    jars:
-      - http://minio.minio.svc.cluster.local:9000/mybucket/data/neo4j-connector-apache-spark_2.12-5.3.1_for_spark_3.jar
   driver:
     labels:
-      version: 3.5.3
+      version: 3.5.5
     cores: 1
     memory: 1024m
     serviceAccount: spark-operator-spark
   executor:
     labels:
-      version: 3.5.3
+      version: 3.5.5
     instances: 1
     cores: 1
     memory: 1024m
