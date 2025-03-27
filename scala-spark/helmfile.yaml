@@ -5,6 +5,8 @@ repositories:
     url: https://charts.min.io/
   - name: neo4j
     url: https://helm.neo4j.com/neo4j
+  - name: strimzi
+    url: https://strimzi.io/charts/
 
 releases:
   - name: spark-operator
@@ -26,6 +28,10 @@ releases:
         value: minioadmin
       - name: persistence.enabled
         value: false
+      - name: buckets[0].name
+        value: mybucket
+      - name: buckets[0].policy
+        value: download
   - name: neo4j-standalone
     namespace: neo4j
     chart: neo4j/neo4j
@@ -39,3 +45,7 @@ releases:
         value: CHANGEME
       - name: volumes.data.mode
         value: defaultStorageClass
+  - name: strimzi-operator
+    namespace: strimzi-kafka
+    chart: strimzi/strimzi-kafka-operator
+    version: 0.45.0

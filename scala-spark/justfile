@@ -3,11 +3,17 @@ SPARK_JAR_LOCATION := "target/scala-2.12/scala-spark_2.12-0.1.0.jar"
 init:
   #!/bin/bash
   set -e
-  minikube start
+  minikube start --memory no-limit
   helmfile apply
+  # set minio alias
   kubectl exec -n minio svc/minio -- mc alias set local http://localhost:9000 minioadmin minioadmin 
-  kubectl exec -n minio svc/minio -- mc mb local/mybucket
-  kubectl exec -n minio svc/minio -- mc anonymous set download local/mybucket
+  # deploy spark-streaming-kafka
+  kubectl apply -f manifests/kafka-single-node.yaml
+  kubectl wait kafkas.kafka.strimzi.io/scala-spark-streaming --for=condition=Ready --timeout=300s -n strimzi-kafka
+  # Port forwards
+  just --justfile {{justfile()}} port-forward
+
+port-forward:
   kubectl port-forward -n minio svc/minio 9000:9000 & \
     kubectl port-forward -n minio svc/minio-console 9001:9001
 
@@ -60,3 +66,13 @@ run-wikipedia-analysis:
   just --justfile {{justfile()}} data-upload
   @kubectl delete -f manifests/spark-app-wikipedia-analysis.yaml > /dev/null || true
   kubectl apply -f manifests/spark-app-wikipedia-analysis.yaml
+
+run-minio-streaming-test:
+  just --justfile {{justfile()}} build-upload
+  eval $(kubectl exec -n minio svc/minio -- mc share upload --expire=1m --insecure --json local/mybucket/input/users.csv | jq -r '.share' | sed "s+@<FILE>+@data/users.csv+")
+  @kubectl delete -f manifests/spark-app-minio-streaming-test.yaml > /dev/null || true
+  kubectl apply -f manifests/spark-app-minio-streaming-test.yaml
+
+# Kafka utils
+list-topics:
+  kubectl exec -n strimzi-kafka svc/spark-streaming-kafka-kafka-bootstrap -- ./bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
